@@ -1,0 +1,72 @@
+﻿@page "/book/delete/{Id:int}"
+
+@using BookAppBlazor.Shared
+@inject HttpClient http
+@inject NavigationManager nav
+@inject IToastService toast
+
+<h3>Delete Book</h3>
+<hr />
+
+<div class="card">
+    <div class="card-header">
+        <h3> Are you sure to delete this? </h3>
+    </div>
+    <div class="card-body">
+        <div class="form-group">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Editorial</th>
+                        <th>Publish Date</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@book.Title</td>
+                        <td>@book.Author</td>
+                        <td>@book.Editorial</td>
+                        <td>@book.PublishDate Date</td>
+                        <td>@book.Price</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer">
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary" @onclick="(async () => await Delete(book.IdBook))">Delete</button>
+            <button type="submit" class="btn btn-danger" @onclick="Cancel">Cancel</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    protected Book book = new Book();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id != 0)
+        {
+            book = await http.GetFromJsonAsync<Book>("api/book/" + Id.ToString());
+        }
+    }
+    protected async Task Delete(int id)
+    {
+        await http.DeleteAsync("api/book/" + id);
+        toast.ShowSuccess("Delete succesfuly");
+        nav.NavigateTo("/");
+    }
+    public void Cancel()
+    {
+        nav.NavigateTo("/");
+    }
+
+
+}
